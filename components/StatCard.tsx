@@ -9,9 +9,10 @@ interface StatCardProps {
   title: string
   value: string
   change: string
+  commerce: any
 }
 
-export function StatCard({ title, value, change }: StatCardProps) {
+export function StatCard({ title, value, change, commerce }: StatCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -19,14 +20,14 @@ export function StatCard({ title, value, change }: StatCardProps) {
         <DollarSign className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{change}</p>
+        <div className="text-2xl font-bold">Gs. {value}</div>
+        <p className="text-xs text-muted-foreground my-3">{change}</p>
         <div className="flex justify-end">
           <Button
             className="mt-2 w-full"
             onClick={async () => {
               try {
-                const respuesta = await apiPayouts.requestPayout('id_de_tienda');
+                const respuesta = await apiPayouts.requestPayout(commerce);
                 console.log('Retiro exitoso:', respuesta);
                 // Aquí puedes agregar lógica adicional después de un retiro exitoso
               } catch (error) {

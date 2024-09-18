@@ -57,16 +57,16 @@ apiStore.listStores = async () => {
 
 apiStore.listTransactions = async (commerce, status) => {
   const token = await getToken();
-  console.log('Token on api service: ', token);
+  console.log('Token on api service listing: ', token);
   // Add custom api call logic here
-  return apiProvider.getAll(`${url}/${commerce.id}/transactions/${status}`, '', token);
+  return apiProvider.getAll(`${url}/${commerce}/transactions/${status}`, '', token);
 }
 
 apiStore.listClosedTransactions = async (commerce, limit, after) => {
   const token = await getToken();
   console.log('Token on api service: ', token);
   // Add custom api call logic here
-  return apiProvider.getAll(`${url}/${commerce.id}/transactions?limit=${limit}&after=${after}`, '', token);
+  return apiProvider.getAll(`${url}/${commerce}/transactions?limit=${limit}&after=${after}`, '', token);
 }
 
 export default apiStore;

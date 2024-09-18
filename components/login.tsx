@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { formatPhoneNumber } from '../utils/phoneUtils';
 import apiUser from '@/app/api-service/apiUser';
 import { setToken } from '@/utils/tokenHandler';
+import router from 'next/router';
 
 const Login: React.FC = () => {
   const [stage, setStage] = useState<'phone' | 'otp'>('phone');
@@ -33,6 +34,28 @@ const Login: React.FC = () => {
       setToken(response.access_token);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const response = await apiUser.login({ phone_number: phoneNumber.trim(), code: otp });
+      console.log(response);
+      if (response && response.data.access_token) {
+        setToken(response.data.access_token);
+        // Aquí puedes agregar lógica adicional después de un inicio de sesión exitoso
+        console.log('Inicio de sesión exitoso');
+        router.push('/dashboard');
+      } else {
+        console.error('Error en el inicio de sesión: Token no recibido');
+      }
+    } catch (error) {
+      console.error('Error en el inicio de sesión:', error);
+      // Aquí puedes manejar errores específicos si es necesario
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +96,7 @@ const Login: React.FC = () => {
               </div>
             </div>
             <CardFooter className="flex justify-center mt-4">
-              <Button type="submit" disabled={isLoading}>
+              <Button onClick={handlePhoneSubmit} disabled={isLoading}>
                 {isLoading ? 'Enviando...' : 'Enviar OTP'}
               </Button>
             </CardFooter>
@@ -98,7 +121,7 @@ const Login: React.FC = () => {
               </div>
             </div>
             <CardFooter className="flex justify-center mt-4">
-              <Button type="submit" className="mr-2" disabled={otp.length !== 6}>Verificar Código</Button>
+              <Button type="submit" className="mr-2" disabled={otp.length !== 6} onClick={handleLogin}>Verificar Código</Button>
               <Button variant="outline" onClick={handleOtpSubmit} disabled={isLoading}>
                 {isLoading ? 'Reenviando...' : 'Reenviar OTP'}
               </Button>

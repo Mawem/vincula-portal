@@ -24,6 +24,7 @@ const apiUser = new ExtendedApiCore({
 //NOTE: patch -> update_user tiene la misma url que un post (aunque tiene diferente header), no estoy seguro como seria
 
 apiUser.login = async (data: any) => {
+  console.log(data);
   return apiProvider.post(`${url}/login`, data);
 };
 

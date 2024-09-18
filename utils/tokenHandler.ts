@@ -1,17 +1,19 @@
+import { setItem, getItem, removeItem, hasItem } from './storageHandler';
+
 const TOKEN_KEY = 'auth_token';
 
 export const setToken = (token: string): void => {
-  localStorage.setItem(TOKEN_KEY, token);
+  setItem(TOKEN_KEY, token);
 };
 
 export const getToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
+  return getItem(TOKEN_KEY);
 };
 
 export const removeToken = (): void => {
-  localStorage.removeItem(TOKEN_KEY);
+  removeItem(TOKEN_KEY);
 };
 
 export const isAuthenticated = (): boolean => {
-  return !!getToken();
+  return hasItem(TOKEN_KEY);
 };

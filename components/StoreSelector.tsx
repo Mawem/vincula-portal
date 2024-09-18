@@ -28,22 +28,6 @@ export function StoreSelector({ items=[], setParentValue, currentValue }: any) {
 
   const [storeList, setStoreList] = React.useState([]);
 
-  React.useEffect(() => {
-    const fetchStores = async () => {
-      try {
-        const stores = await apiStore.listStores();
-        const formattedStores = stores.map((store: any) => ({
-          label: store.name,
-          value: store.id
-        }));
-        setStoreList(formattedStores);
-      } catch (error) {
-        console.error("Error al obtener la lista de comercios:", error);
-      }
-    };
-
-    fetchStores();
-  }, []);
 
   const handleStoreSelection = (selectedValue: string) => {
     setValue(selectedValue);

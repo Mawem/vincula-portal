@@ -1,26 +1,47 @@
-// Manejador de almacenamiento local
+const isLocalStorageAvailable = (): boolean => {
+  try {
+    const testKey = '__test__';
+    localStorage.setItem(testKey, testKey);
+    localStorage.removeItem(testKey);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
 
-// Función para guardar un elemento en el almacenamiento local
+const safeLocalStorageOperation = (operation: () => void): void => {
+  if (isLocalStorageAvailable()) {
+    operation();
+  } else {
+    console.warn('localStorage no está disponible');
+  }
+};
+
+
 export const setItem = (key: string, value: string): void => {
-  localStorage.setItem(key, value);
+  safeLocalStorageOperation(() => localStorage.setItem(key, value));
 };
 
-// Función para obtener un elemento del almacenamiento local
 export const getItem = (key: string): string | null => {
-  return localStorage.getItem(key);
+  if (isLocalStorageAvailable()) {
+    return localStorage.getItem(key);
+  }
+  console.warn('localStorage no está disponible');
+  return null;
 };
 
-// Función para eliminar un elemento del almacenamiento local
 export const removeItem = (key: string): void => {
-  localStorage.removeItem(key);
+  safeLocalStorageOperation(() => localStorage.removeItem(key));
 };
 
-// Función para limpiar todo el almacenamiento local
 export const clearStorage = (): void => {
-  localStorage.clear();
+  safeLocalStorageOperation(() => localStorage.clear());
 };
 
-// Función para verificar si existe un elemento en el almacenamiento local
 export const hasItem = (key: string): boolean => {
-  return localStorage.getItem(key) !== null;
+  if (isLocalStorageAvailable()) {
+    return localStorage.getItem(key) !== null;
+  }
+  console.warn('localStorage no está disponible');
+  return false;
 };
