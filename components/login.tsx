@@ -8,6 +8,7 @@ import { formatPhoneNumber } from '../utils/phoneUtils';
 import apiUser from '@/app/api-service/apiUser';
 import { setToken } from '@/utils/tokenHandler';
 import router from 'next/router';
+import { signIn } from 'next-auth/react';
 
 const Login: React.FC = () => {
   const [stage, setStage] = useState<'phone' | 'otp'>('phone');
@@ -43,19 +44,19 @@ const Login: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await apiUser.login({ phone_number: phoneNumber.trim(), code: otp });
-      console.log(response);
-      if (response && response.data.access_token) {
-        setToken(response.data.access_token);
-        // Aquí puedes agregar lógica adicional después de un inicio de sesión exitoso
+      const res = await signIn("credentials", {
+        phone_number: phoneNumber.trim(),
+        code: otp,
+        redirect: true,
+        callbackUrl: "/dashboard",
+      });
+      if (res) {
         console.log('Inicio de sesión exitoso');
-        router.push('/dashboard');
       } else {
         console.error('Error en el inicio de sesión: Token no recibido');
       }
     } catch (error) {
       console.error('Error en el inicio de sesión:', error);
-      // Aquí puedes manejar errores específicos si es necesario
     } finally {
       setIsLoading(false);
     }

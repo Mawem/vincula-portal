@@ -8,8 +8,15 @@ import apiStore from '@/app/api-service/apiStore';
 import { getItem } from '@/utils/storageHandler';
 import moment from 'moment';
 import apiPayouts from "../api-service/apiPayouts"
+import { getSession } from "next-auth/react"
+import { redirect } from "next/navigation"
+
 
 export default function Dashboard() {
+  /* const session = getSession();
+  if (!session) {
+    redirect("/login");
+  } */
   const [pendingTransactions, setPendingTransactions] = useState([]);
   const [availableTransactions, setAvailableTransactions] = useState([]);
   const [closedTransactions, setClosedTransactions] = useState([]);
@@ -74,7 +81,7 @@ export default function Dashboard() {
           }))
         );
 
-        const availableForPayout = await apiStore.listTransactions(commerce, 'available_for_payout');
+        const availableForPayout = await apiStore.listTransactions(commerce, 'active');
         setAvailableTransactions(availableForPayout.data.data.unwithdrawn.map((it: any) => ({
           Fecha: moment(it.inserted_at).format('DD/MM/YYYY'),
           Hora: moment(it.inserted_at).format('HH:mm:ss'),
@@ -83,6 +90,8 @@ export default function Dashboard() {
           Cliente: it.payer.full_name,
           Medio: it.payment_method.toUpperCase()
         })));
+
+        console.log('available for payout: ',  availableForPayout)
 
         //TODO: implement pagination
         const closedTrans = await apiStore.listClosedTransactions(commerce, '10', '');
@@ -129,6 +138,15 @@ export default function Dashboard() {
             value={formatCurrency(balance.balance)}
             commerce={commerce}
             change={balance.is_payout_pending ? 'Retiro solicitado' : 'Disponible para retiro'}
+            display_withdraw={true}
+          />
+
+          <StatCard
+            title="Total acumulado"
+            value={formatCurrency(balance.balance)}
+            commerce={commerce}
+            change={'Total retirado historicamente'}
+            display_withdraw={false}
           />
           {/* <StatCard
             title=""

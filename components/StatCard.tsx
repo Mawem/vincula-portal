@@ -10,9 +10,10 @@ interface StatCardProps {
   value: string
   change: string
   commerce: any
+  display_withdraw: boolean
 }
 
-export function StatCard({ title, value, change, commerce }: StatCardProps) {
+export function StatCard({ title, value, change, commerce, display_withdraw }: StatCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -23,8 +24,8 @@ export function StatCard({ title, value, change, commerce }: StatCardProps) {
         <div className="text-2xl font-bold">Gs. {value}</div>
         <p className="text-xs text-muted-foreground my-3">{change}</p>
         <div className="flex justify-end">
+          {display_withdraw && (
           <Button
-            className="mt-2 w-full"
             onClick={async () => {
               try {
                 const respuesta = await apiPayouts.requestPayout(commerce);
@@ -38,6 +39,7 @@ export function StatCard({ title, value, change, commerce }: StatCardProps) {
           >
             Retirar
           </Button>
+            )}
         </div>
       </CardContent>
     </Card>

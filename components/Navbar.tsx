@@ -21,8 +21,8 @@ import { getItem, setItem } from "@/utils/storageHandler"
 
 const menuItems = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
-  { icon: Book, label: "Historial", href: "/historial" },
-]
+/*   { icon: Book, label: "Historial", href: "/historial" },
+ */]
 
 
 const fetchStores: any = async () => {
@@ -67,7 +67,7 @@ export function Navbar() {
             href="/"
             className="flex items-center gap-2 text-lg font-semibold md:text-base"
             >
-            <Image src="/circle.png" alt="Vincula Pagos" width={80} height={80} />
+            <Image src="/circle.png" alt="Vincula Pagos" width={60} height={60} />
             <span className="sr-only">Vincula Pagos</span>
             </Link>
             {menuItems.map((item) => (
