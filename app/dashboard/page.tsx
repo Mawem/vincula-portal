@@ -22,12 +22,13 @@ export default function Dashboard() {
   const [closedTransactions, setClosedTransactions] = useState([]);
   const [commerce, setCommerce] = useState<any>();
   const [balance, setBalance] = useState({ balance: 0, is_payout_pending: false });
+  const [payoutMtd, setPayoutMtd] = useState('');
+  const [payRequested, setPayRequested] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const formatCurrency = (value: number): string => {
-      console.log(typeof value)
       return new Intl.NumberFormat("es-Cl", {minimumFractionDigits: 0, maximumFractionDigits: 0}).format(value);
   }
 
@@ -38,7 +39,7 @@ export default function Dashboard() {
       try {
         const response = await apiPayouts.getBalance();
         const filteredBalance = response.data.data.filter((it: any) => it.store_id === commerce)[0];
-        console.log('filteredBalance: ', filteredBalance);
+        setPayoutMtd(filteredBalance.payout_mtd);
         setBalance(filteredBalance);
       } catch (error) {
         console.error('Error al obtener el balance:', error);
@@ -46,7 +47,7 @@ export default function Dashboard() {
     };
 
     fetchBalance();
-  }, [commerce]);
+  }, [commerce, payRequested]);
 
   useEffect(() => {
     window.addEventListener('storage', () => {
@@ -56,8 +57,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     const storedCommerce = getItem('current_commerce');
-
-    console.log('storedCommerce: ', storedCommerce);
     if (storedCommerce) {
       setCommerce(storedCommerce);
     }
@@ -65,12 +64,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      console.log('commerce: ', !commerce);
       if (!commerce) return;
 
       try {
         const activeTransactions = await apiStore.listTransactions(commerce, 'active');
-        console.log('activeTransactions: ', activeTransactions.data.data.pending);
         setPendingTransactions(activeTransactions.data.data.pending.map((it: any) => ({
             Fecha: moment(it.inserted_at).format('DD/MM/YYYY'),
             Hora: moment(it.inserted_at).format('HH:mm:ss'),
@@ -91,12 +88,8 @@ export default function Dashboard() {
           Medio: it.payment_method.toUpperCase()
         })));
 
-        console.log('available for payout: ',  availableForPayout)
-
         //TODO: implement pagination
-        const closedTrans = await apiStore.listClosedTransactions(commerce, '10', '');
-        setClosedTransactions(closedTrans); 
-        console.log('closedTrans: ', closedTrans.data.data)
+        await fetchClosedTransactions(1);
       } catch (error) {
         console.error('Error al obtener las transacciones:', error);
       }
@@ -108,11 +101,12 @@ export default function Dashboard() {
 
   const fetchClosedTransactions = async (page: number) => {
     if (!commerce) return;
-
     try {
       const closedTrans = await apiStore.listClosedTransactions(commerce, '10', ((page - 1) * 10).toString());
-      setClosedTransactions(closedTrans.data.data);
-      setTotalPages(Math.ceil(closedTrans.data.total / 10));
+      if(closedTrans.data.data.length > 0){
+        setClosedTransactions(closedTrans.data.data);
+        setTotalPages(Math.ceil(closedTrans.data.total / 10));
+      }
     } catch (error) {
       console.error('Error al obtener las transacciones cerradas:', error);
     }
@@ -139,6 +133,8 @@ export default function Dashboard() {
             commerce={commerce}
             change={balance.is_payout_pending ? 'Retiro solicitado' : 'Disponible para retiro'}
             display_withdraw={true}
+            payRequestStatus={balance.is_payout_pending}
+            setPayRequested={setPayRequested}
           />
 
           <StatCard
@@ -147,13 +143,9 @@ export default function Dashboard() {
             commerce={commerce}
             change={'Total retirado historicamente'}
             display_withdraw={false}
+            payRequestStatus={balance.is_payout_pending}
+            setPayRequested={setPayRequested}
           />
-          {/* <StatCard
-            title=""
-            value="+2350"
-            change="+180.1% from last month"
-            icon={Users}
-          /> */}
         </div>
         <div className="grid gap-2 md:gap-8 lg:grid-cols-2 xl:grid-cols-1">
           <Tabs defaultValue="pendientes" className="w-full">

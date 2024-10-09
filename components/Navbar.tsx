@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import apiStore from "@/app/api-service/apiStore"
 import { getItem, setItem } from "@/utils/storageHandler"
+import { signOut } from "next-auth/react"
 
 
 const menuItems = [
@@ -28,7 +29,6 @@ const menuItems = [
 const fetchStores: any = async () => {
     try {
       const stores = await apiStore.listStores();
-      console.log('stores: ', stores);
       const formattedStores = stores.data.data.map((store: any) => ({
         label: store.store_side_name,
         value: store.id
@@ -41,14 +41,15 @@ const fetchStores: any = async () => {
 
 
 export function Navbar() {
-  const [stores, setStores] = useState([]);
+  const [stores, setStores] = useState<any>([]);
   const [currentStore, setCurrentStoreFromSelector] = useState(getItem('current_commerce'));
 
   useEffect(() => {
-    fetchStores().then((stores: any) => {
-        console.log('stores: ', stores);
+    fetchStores().then((stores: any[]) => {
+      if(stores?.length > 0){
         setStores(stores);
-        setCurrentStore(stores[0].value);
+        setCurrentStore(stores[0]?.value);
+      }
     });
   }, []);
 
@@ -142,12 +143,12 @@ export function Navbar() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
+                {/* <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <Link href="/profile"><DropdownMenuItem>Perfil</DropdownMenuItem></Link>
-                <DropdownMenuItem>Configuración</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Cerrar sesión</DropdownMenuItem>
+                <DropdownMenuItem>Configuración</DropdownMenuItem> */}
+                {/* <DropdownMenuSeparator /> */}
+                <DropdownMenuItem onClick={() => {signOut()}}>Cerrar sesión</DropdownMenuItem>
             </DropdownMenuContent>
             </DropdownMenu>
         </div>

@@ -11,9 +11,11 @@ interface StatCardProps {
   change: string
   commerce: any
   display_withdraw: boolean
+  payRequestStatus: boolean
+  setPayRequested: any
 }
 
-export function StatCard({ title, value, change, commerce, display_withdraw }: StatCardProps) {
+export function StatCard({ title, value, change, commerce, display_withdraw, payRequestStatus, setPayRequested }: StatCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -21,19 +23,23 @@ export function StatCard({ title, value, change, commerce, display_withdraw }: S
         <DollarSign className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">Gs. {value}</div>
+        <div className="text-2xl font-bold">Gs. {value} </div>
         <p className="text-xs text-muted-foreground my-3">{change}</p>
         <div className="flex justify-end">
           {display_withdraw && (
           <Button
+            disabled={payRequestStatus}
             onClick={async () => {
               try {
+                if (payRequestStatus) {
+                  console.log('Ya hay un retiro en curso');
+                  return;
+                }
                 const respuesta = await apiPayouts.requestPayout(commerce);
                 console.log('Retiro exitoso:', respuesta);
-                // Aquí puedes agregar lógica adicional después de un retiro exitoso
+                setPayRequested(true);
               } catch (error) {
                 console.error('Error al realizar el retiro:', error);
-                // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
               }
             }}
           >

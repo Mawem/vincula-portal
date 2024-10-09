@@ -60,8 +60,8 @@ export function StoreSelector({ items=[], setParentValue, currentValue }: any) {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." />
-          <CommandEmpty>No Item found.</CommandEmpty>
+          <CommandInput placeholder="Buscar Comercio" />
+          <CommandEmpty>Sin resultados.</CommandEmpty>
           <CommandList>
             <CommandGroup>
               {items.map((item: any) => (
